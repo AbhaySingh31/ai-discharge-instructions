@@ -16,21 +16,27 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
 
 # Copy backend requirements and install Python dependencies
 COPY backend/requirements.txt /app/backend/
-RUN cd backend && pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+WORKDIR /app/backend
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 # Copy frontend package.json and install Node dependencies
+WORKDIR /app
 COPY frontend/package*.json /app/frontend/
-RUN cd frontend && npm install
+WORKDIR /app/frontend
+RUN npm install
 
 # Copy all application code
+WORKDIR /app
 COPY . /app/
 
 # Build frontend
-RUN cd frontend && npm run build
+WORKDIR /app/frontend
+RUN npm run build
 
 # Set up database and seed data
-RUN cd backend && python seed_database.py || echo "Database seeding failed, continuing..."
-RUN cd backend && python simple_migration.py || echo "Migration failed, continuing..."
+WORKDIR /app/backend
+RUN python seed_database.py || echo "Database seeding failed, continuing..."
+RUN python simple_migration.py || echo "Migration failed, continuing..."
 
 # Expose port
 EXPOSE $PORT
