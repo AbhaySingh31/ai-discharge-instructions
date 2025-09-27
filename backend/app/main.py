@@ -1,116 +1,63 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from app.api import endpoints, patient_history_endpoints
+from app.core.config import settings
+from app.core.database import engine
+from app.models import patient
 import logging
 import os
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
-
-from app.core.config import settings
-from app.core.database import create_tables
-from app.api.endpoints import router
-from app.api.patient_history_endpoints import router as history_router
 
 # Configure logging
-logging.basicConfig(
-    level=getattr(logging, settings.log_level),
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Create FastAPI app
+# Create database tables
+patient.Base.metadata.create_all(bind=engine)
+
 app = FastAPI(
-    title=settings.app_name,
-    version=settings.app_version,
-    description="AI-powered personalized patient discharge instructions system",
-    docs_url="/docs" if settings.debug else None,
-    redoc_url="/redoc" if settings.debug else None,
+    title=settings.APP_NAME,
+    description="AI-powered discharge instructions system",
+    version="1.0.0",
+    docs_url="/docs" if settings.DEBUG else None,
+    redoc_url="/redoc" if settings.DEBUG else None,
 )
 
-# Add CORS middleware
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Add trusted host middleware for security
-app.add_middleware(
-    TrustedHostMiddleware,
-    allowed_hosts=["localhost", "127.0.0.1", "*.localhost"]
-)
+# Include API routers
+app.include_router(endpoints.router, prefix="/api/v1")
+app.include_router(patient_history_endpoints.router, prefix="/api/v1")
 
-# Include API routes
-app.include_router(router, prefix="/api/v1")
-app.include_router(history_router, prefix="/api/v1")
-
-@app.on_event("startup")
-async def startup_event():
-    """Initialize the application on startup."""
-    logger.info("Starting AI Discharge Instructions API...")
+# Serve static files if frontend build exists
+frontend_build_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", "build")
+if os.path.exists(frontend_build_path):
+    app.mount("/static", StaticFiles(directory=os.path.join(frontend_build_path, "static")), name="static")
     
-    # Create database tables
-    try:
-        create_tables()
-        logger.info("Database tables created successfully")
-    except Exception as e:
-        logger.error(f"Error creating database tables: {str(e)}")
-        raise
+    @app.get("/")
+    async def serve_frontend():
+        return FileResponse(os.path.join(frontend_build_path, "index.html"))
     
-    # Check OpenRouter API key
-    if not settings.openrouter_api_key:
-        logger.warning("OpenRouter API key not configured. AI features will not work.")
-    else:
-        logger.info("OpenRouter API key configured successfully")
-    
-    logger.info("Application startup completed")
+    @app.get("/{path:path}")
+    async def serve_frontend_routes(path: str):
+        file_path = os.path.join(frontend_build_path, path)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            return FileResponse(file_path)
+        return FileResponse(os.path.join(frontend_build_path, "index.html"))
+else:
+    @app.get("/")
+    async def root():
+        return {"message": "AI Discharge Instructions API", "version": "1.0.0"}
 
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Clean up on application shutdown."""
-    logger.info("Shutting down AI Discharge Instructions API...")
-
-@app.get("/")
-async def root():
-    """Root endpoint with API information."""
-    return {
-        "message": "AI Discharge Instructions API",
-        "version": settings.app_version,
-        "status": "running",
-        "docs_url": "/docs" if settings.debug else "Documentation disabled in production"
-    }
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint for monitoring."""
-    return {
-        "status": "healthy",
-        "service": settings.app_name,
-        "version": settings.app_version
-    }
-
-# Error handlers
-@app.exception_handler(404)
-async def not_found_handler(request, exc):
-    return {"error": "Resource not found", "status_code": 404}
-
-@app.exception_handler(500)
-async def internal_error_handler(request, exc):
-    logger.error(f"Internal server error: {str(exc)}")
-    return {"error": "Internal server error", "status_code": 500}
-
-if __name__ == "__main__":
-    import uvicorn
-    
-    # Run the application
-    uvicorn.run(
-        "app.main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=settings.debug,
-        log_level=settings.log_level.lower()
-    )
+    return {"status": "healthy", "message": "API is running"}
