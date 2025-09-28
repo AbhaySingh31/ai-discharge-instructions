@@ -14,33 +14,31 @@ RUN apt-get update && apt-get install -y \
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs
 
-# Copy backend requirements and install Python dependencies
-COPY backend/requirements.txt /app/backend/
+# Copy and install backend dependencies
+COPY backend/requirements.txt ./backend/
 WORKDIR /app/backend
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
-# Copy frontend package.json and install Node dependencies
+# Copy and install frontend dependencies
 WORKDIR /app
-COPY frontend/package*.json /app/frontend/
+COPY frontend/package*.json ./frontend/
 WORKDIR /app/frontend
 RUN npm install
 
-# Copy all application code
+# Copy all source code
 WORKDIR /app
-COPY . /app/
+COPY . .
 
 # Build frontend
 WORKDIR /app/frontend
 RUN npm run build
 
-# Set up database and seed data
+# Setup backend database
 WORKDIR /app/backend
-RUN python seed_database.py || echo "Database seeding failed, continuing..."
-RUN python simple_migration.py || echo "Migration failed, continuing..."
+RUN python seed_database.py || true
+RUN python simple_migration.py || true
 
-# Expose port
-EXPOSE $PORT
-
-# Start the backend server
+# Set final working directory and start command
 WORKDIR /app/backend
-CMD ["sh", "-c", "python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+EXPOSE 8000
+CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
