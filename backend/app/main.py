@@ -9,6 +9,14 @@ from app.models import patient
 import logging
 import os
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+    logging.info("Environment variables loaded from .env file")
+except ImportError:
+    logging.warning("python-dotenv not installed, environment variables may not be loaded")
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

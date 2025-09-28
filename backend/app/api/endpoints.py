@@ -17,8 +17,14 @@ from app.services.patient_service import PatientService
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-# Initialize AI service
-ai_service = DischargeInstructionsAI()
+# Initialize AI service lazily
+ai_service = None
+
+def get_ai_service():
+    global ai_service
+    if ai_service is None:
+        ai_service = DischargeInstructionsAI()
+    return ai_service
 
 @router.post("/patients/", response_model=PatientResponse)
 async def create_patient(
@@ -223,13 +229,13 @@ async def generate_discharge_instructions(
         }
         
         # Generate personalized instructions using AI
-        if not ai_service.client:
+        if not get_ai_service().client:
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail="AI service is not available. OpenRouter API key is not configured."
             )
         
-        instructions = ai_service.generate_personalized_instructions(
+        instructions = get_ai_service().generate_personalized_instructions(
             patient_dict,
             medical_record_dict,
             discharge_note_dict
@@ -325,20 +331,20 @@ async def ask_question(
         }
         
         # Check if AI service is available
-        if not ai_service.client:
+        if not get_ai_service().client:
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail="AI service is not available. OpenRouter API key is not configured."
             )
         
-        instructions = ai_service.generate_personalized_instructions(
+        instructions = get_ai_service().generate_personalized_instructions(
             patient_dict,
             medical_record_dict,
             discharge_note_dict
         )
         
         # Answer the question
-        response = ai_service.answer_patient_question(
+        response = get_ai_service().answer_patient_question(
             question,
             patient_context,
             instructions
