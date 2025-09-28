@@ -7,8 +7,6 @@ import {
   PaperAirplaneIcon,
   UserIcon,
   ComputerDesktopIcon,
-  ClockIcon,
-  HeartIcon,
   DocumentTextIcon,
   ExclamationTriangleIcon,
   InformationCircleIcon,
@@ -59,7 +57,7 @@ const PatientQA: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch comprehensive patient history with fallback
-  const { data: patientHistory, isLoading: historyLoading, error: historyError } = useQuery<ComprehensivePatientHistory>(
+  const { data: patientHistory, isLoading: historyLoading } = useQuery<ComprehensivePatientHistory>(
     ['comprehensive-history', patientId],
     async () => {
       try {
@@ -88,12 +86,12 @@ const PatientQA: React.FC = () => {
     }
   );
 
-  // Fetch patient basic info
-  const { data: patient } = useQuery(
-    ['patient', patientId],
-    () => patientService.getPatient(patientId!),
-    { enabled: !!patientId }
-  );
+  // TODO: Remove if not needed
+  // const { data: patient } = useQuery(
+  //   ['patient', patientId],
+  //   () => patientService.getPatient(patientId!),
+  //   { enabled: !!patientId }
+  // );
 
   // AI Q&A mutation
   const askQuestionMutation = useMutation(

@@ -12,7 +12,6 @@ import {
   PlusIcon,
   EyeIcon,
   ClipboardDocumentListIcon,
-  PencilIcon,
   QuestionMarkCircleIcon
 } from '@heroicons/react/24/outline';
 import { patientService, Medication } from '../services/api';
@@ -20,7 +19,7 @@ import { format } from 'date-fns';
 
 const PatientDetail: React.FC = () => {
   const { patientId } = useParams<{ patientId: string }>();
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient(); // TODO: Uncomment when adding mutations
   const [showAddMedication, setShowAddMedication] = useState(false);
   const [newMedication, setNewMedication] = useState<Medication>({
     name: '',
@@ -41,7 +40,7 @@ const PatientDetail: React.FC = () => {
     { enabled: !!patientId }
   );
 
-  const { data: dischargeNotes, isLoading: notesLoading } = useQuery(
+  const { data: dischargeNotes } = useQuery(
     ['dischargeNotes', patientId],
     () => patientService.getDischargeNotes(patientId!),
     { enabled: !!patientId }

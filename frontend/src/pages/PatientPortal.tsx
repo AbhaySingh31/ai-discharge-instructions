@@ -19,7 +19,7 @@ const PatientPortal: React.FC = () => {
   const { patientId } = useParams<{ patientId: string }>();
   const [question, setQuestion] = useState('');
   const [qaHistory, setQaHistory] = useState<QAResponse[]>([]);
-  const [selectedRecordId, setSelectedRecordId] = useState<number | null>(null);
+  // const [selectedRecordId, setSelectedRecordId] = useState<number | null>(null); // TODO: Implement record selection
 
   const { data: patient } = useQuery(
     ['patient', patientId],
@@ -52,7 +52,7 @@ const PatientPortal: React.FC = () => {
 
   const askQuestionMutation = useMutation(
     ({ question }: { question: string }) =>
-      patientService.askQuestion(patientId!, question, selectedRecordId || latestRecordWithInstructions!.id),
+      patientService.askQuestion(patientId!, question, latestRecordWithInstructions!.id),
     {
       onSuccess: (data) => {
         setQaHistory(prev => [...prev, data]);
@@ -67,7 +67,7 @@ const PatientPortal: React.FC = () => {
 
   const handleAskQuestion = (e: React.FormEvent) => {
     e.preventDefault();
-    if (question.trim() && (selectedRecordId || latestRecordWithInstructions)) {
+    if (question.trim() && latestRecordWithInstructions) {
       askQuestionMutation.mutate({ question: question.trim() });
     }
   };

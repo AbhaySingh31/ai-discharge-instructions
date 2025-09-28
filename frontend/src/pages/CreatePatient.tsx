@@ -41,15 +41,16 @@ const CreatePatient: React.FC = () => {
     name: 'medical_history'
   });
 
-  const { fields: allergyFields, append: appendAllergy, remove: removeAllergy } = useFieldArray({
-    control,
-    name: 'allergies'
-  });
+  // TODO: Implement allergy and medication forms
+  // const { fields: allergyFields, append: appendAllergy, remove: removeAllergy } = useFieldArray({
+  //   control,
+  //   name: 'allergies'
+  // });
 
-  const { fields: medicationFields, append: appendMedication, remove: removeMedication } = useFieldArray({
-    control,
-    name: 'current_medications'
-  });
+  // const { fields: medicationFields, append: appendMedication, remove: removeMedication } = useFieldArray({
+  //   control,
+  //   name: 'current_medications'
+  // });
 
   const createPatientMutation = useMutation(patientService.createPatient, {
     onSuccess: (data) => {
