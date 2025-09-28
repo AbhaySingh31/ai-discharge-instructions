@@ -11,7 +11,7 @@ import {
   ChatBubbleLeftRightIcon,
   PaperAirplaneIcon
 } from '@heroicons/react/24/outline';
-import { PersonalizedInstructions, QAResponse } from '../services/api';
+import { patientService, PersonalizedInstructions, QAResponse, MedicationSchedule, FollowUpReminder, EmergencyContactInfo } from '../services/api';
 import { format } from 'date-fns';
 
 const DischargeInstructions: React.FC = () => {
@@ -166,7 +166,7 @@ const DischargeInstructions: React.FC = () => {
               Medication Schedule
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {instructions.medication_schedule.map((medication, index) => (
+              {instructions.medication_schedule.map((medication: MedicationSchedule, index: number) => (
                 <div key={index} className="bg-green-50 border border-green-200 rounded-lg p-4">
                   <h3 className="font-semibold text-green-900">{medication.name}</h3>
                   <p className="text-green-800"><strong>Dosage:</strong> {medication.dosage}</p>
@@ -190,7 +190,7 @@ const DischargeInstructions: React.FC = () => {
             </h2>
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <ul className="space-y-2">
-                {instructions.warning_signs.map((sign, index) => (
+                {instructions.warning_signs.map((sign: string, index: number) => (
                   <li key={index} className="flex items-start space-x-2 text-red-800">
                     <span className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></span>
                     <span>{sign}</span>
@@ -210,7 +210,7 @@ const DischargeInstructions: React.FC = () => {
             </h2>
             <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
               <ul className="space-y-2">
-                {instructions.activity_guidelines.map((guideline, index) => (
+                {instructions.activity_guidelines.map((guideline: string, index: number) => (
                   <li key={index} className="flex items-start space-x-2 text-purple-800">
                     <span className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></span>
                     <span>{guideline}</span>
@@ -227,7 +227,7 @@ const DischargeInstructions: React.FC = () => {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Diet Recommendations</h2>
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
               <ul className="space-y-2">
-                {instructions.diet_recommendations.map((recommendation, index) => (
+                {instructions.diet_recommendations.map((recommendation: string, index: number) => (
                   <li key={index} className="flex items-start space-x-2 text-yellow-800">
                     <span className="w-2 h-2 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></span>
                     <span>{recommendation}</span>
@@ -244,7 +244,7 @@ const DischargeInstructions: React.FC = () => {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Lifestyle Recommendations</h2>
             <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
               <ul className="space-y-2">
-                {instructions.lifestyle_recommendations.map((recommendation, index) => (
+                {instructions.lifestyle_recommendations.map((recommendation: string, index: number) => (
                   <li key={index} className="flex items-start space-x-2 text-indigo-800">
                     <span className="w-2 h-2 bg-indigo-500 rounded-full mt-2 flex-shrink-0"></span>
                     <span>{recommendation}</span>
@@ -260,7 +260,7 @@ const DischargeInstructions: React.FC = () => {
           <div className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Follow-up Appointments</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {instructions.follow_up_reminders.map((reminder, index) => (
+              {instructions.follow_up_reminders.map((reminder: FollowUpReminder, index: number) => (
                 <div key={index} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                   <h3 className="font-semibold text-gray-900">{reminder.type}</h3>
                   <p className="text-gray-700"><strong>When:</strong> {reminder.timeframe}</p>
@@ -280,7 +280,7 @@ const DischargeInstructions: React.FC = () => {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Wound Care Instructions</h2>
             <div className="bg-pink-50 border border-pink-200 rounded-lg p-4">
               <ol className="space-y-2">
-                {instructions.wound_care_instructions.map((instruction, index) => (
+                {instructions.wound_care_instructions.map((instruction: string, index: number) => (
                   <li key={index} className="flex items-start space-x-2 text-pink-800">
                     <span className="bg-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center mt-0.5 flex-shrink-0">
                       {index + 1}
@@ -297,7 +297,7 @@ const DischargeInstructions: React.FC = () => {
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Emergency Contacts</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {instructions.emergency_contacts.map((contact, index) => (
+            {instructions.emergency_contacts.map((contact: EmergencyContactInfo, index: number) => (
               <div key={index} className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <h3 className="font-semibold text-red-900">{contact.name}</h3>
                 <p className="text-red-800 text-lg font-medium">{contact.phone}</p>
