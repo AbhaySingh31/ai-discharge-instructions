@@ -21,17 +21,17 @@ except Exception as e:
     logger.error(f"Error creating database tables: {str(e)}")
 
 app = FastAPI(
-    title=settings.APP_NAME,
+    title=settings.app_name,
     description="AI-powered discharge instructions system",
-    version="1.0.0",
-    docs_url="/docs" if settings.DEBUG else None,
-    redoc_url="/redoc" if settings.DEBUG else None,
+    version=settings.app_version,
+    docs_url="/docs" if settings.debug else None,
+    redoc_url="/redoc" if settings.debug else None,
 )
 
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=settings.allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
