@@ -57,8 +57,8 @@ class MedicalRecord(Base):
     vital_signs = Column(JSON)
     severity_level = Column(String, default="moderate")
     visit_id = Column(Integer, nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
 
 class DischargeNote(Base):
     __tablename__ = "discharge_notes"
@@ -74,7 +74,7 @@ class DischargeNote(Base):
     warning_signs = Column(Text)
     discharge_physician = Column(String)
     discharge_date = Column(DateTime, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime, server_default=func.now())
 
 # Pydantic Models for API
 class EmergencyContact(BaseModel):
