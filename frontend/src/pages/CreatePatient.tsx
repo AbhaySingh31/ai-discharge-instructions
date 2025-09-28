@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useMutation, useQueryClient } from 'react-query';
 import { toast } from 'react-toastify';
 import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { patientService, Allergy, Medication } from '../services/api';
+import { patientService, type Allergy, type Medication } from '../services/api';
 
 interface PatientFormData {
   patient_id: string;
@@ -21,24 +21,34 @@ interface PatientFormData {
     email?: string;
   };
   medical_history: { condition: string }[];
+  allergies: Omit<Allergy, 'id'>[];
+  current_medications: Omit<Medication, 'id'>[];
 }
 const CreatePatient: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   
-  // State for dynamic fields
-  const [allergies] = useState<string[]>([]);
-  const [medications] = useState<any[]>([]);
-
   const { register, handleSubmit, control, formState: { errors } } = useForm<PatientFormData>({
     defaultValues: {
-      medical_history: [{ condition: '' }]
+      medical_history: [{ condition: '' }],
+      allergies: [],
+      current_medications: []
     }
   });
 
   const { fields: historyFields, append: appendHistory, remove: removeHistory } = useFieldArray({
     control,
     name: 'medical_history'
+  });
+
+  const { fields: allergyFields, append: appendAllergy, remove: removeAllergy } = useFieldArray({
+    control,
+    name: 'allergies'
+  });
+
+  const { fields: medicationFields, append: appendMedication, remove: removeMedication } = useFieldArray({
+    control,
+    name: 'current_medications'
   });
 
   const createPatientMutation = useMutation(patientService.createPatient, {
@@ -56,15 +66,22 @@ const CreatePatient: React.FC = () => {
   });
 
   const onSubmit = (data: PatientFormData) => {
-    // Clean up empty fields and combine with state data
     const cleanedData = {
       ...data,
       date_of_birth: new Date(data.date_of_birth).toISOString(),
       medical_history: data.medical_history
         .map(item => item.condition.trim())
         .filter(condition => condition !== ''),
-      allergies: allergies.filter((allergy: Allergy) => allergy.allergen.trim() !== ''),
-      current_medications: medications.filter((med: Medication) => med.name.trim() !== ''),
+      // Filter out empty allergies and ensure proper structure
+      allergies: (data.allergies || [])
+        .filter((allergy): allergy is Omit<Allergy, 'id'> => 
+          Boolean(allergy?.allergen?.trim())
+        ),
+      // Filter out empty medications and ensure proper structure
+      current_medications: (data.current_medications || [])
+        .filter((med): med is Omit<Medication, 'id'> => 
+          Boolean(med?.name?.trim())
+        )
     };
 
     createPatientMutation.mutate(cleanedData);
