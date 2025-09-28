@@ -33,10 +33,10 @@ COPY . .
 WORKDIR /app/frontend
 RUN npm run build
 
-# Setup backend database
+# Setup backend database - commented out for now
 WORKDIR /app/backend
-RUN python seed_database.py || true
-RUN python simple_migration.py || true
+# RUN python seed_database.py || true
+# RUN python simple_migration.py || true
 
 # Set final working directory and start command
 WORKDIR /app/backend

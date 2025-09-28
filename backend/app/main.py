@@ -13,8 +13,12 @@ import os
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Create database tables
-patient.Base.metadata.create_all(bind=engine)
+# Create database tables on startup
+try:
+    patient.Base.metadata.create_all(bind=engine)
+    logger.info("Database tables created successfully")
+except Exception as e:
+    logger.error(f"Error creating database tables: {str(e)}")
 
 app = FastAPI(
     title=settings.APP_NAME,

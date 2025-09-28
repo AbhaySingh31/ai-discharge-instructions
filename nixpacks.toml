@@ -1,19 +1,20 @@
-[phases.setup]
-nixPkgs = ['python39', 'python39Packages.pip', 'nodejs-18_x', 'npm']
+# Disabled - using Dockerfile instead
+# [phases.setup]
+# nixPkgs = ['python39', 'python39Packages.pip', 'nodejs-18_x', 'npm']
 
-[phases.install]
-cmds = [
-    'cd backend && python -m pip install --upgrade pip',
-    'cd backend && python -m pip install -r requirements.txt',
-    'cd frontend && npm install'
-]
+# [phases.install]
+# cmds = [
+#     'cd backend && python -m pip install --upgrade pip',
+#     'cd backend && python -m pip install -r requirements.txt',
+#     'cd frontend && npm install'
+# ]
 
-[phases.build]
-cmds = [
-    'cd backend && python seed_database.py',
-    'cd backend && python simple_migration.py',
-    'cd frontend && npm run build'
-]
+# [phases.build]
+# cmds = [
+#     'cd backend && python seed_database.py',
+#     'cd backend && python simple_migration.py',
+#     'cd frontend && npm run build'
+# ]
 
-[start]
-cmd = 'cd backend && python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT'
+# [start]
+# cmd = 'cd backend && python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT'
