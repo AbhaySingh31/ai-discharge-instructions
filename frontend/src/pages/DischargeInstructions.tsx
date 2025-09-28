@@ -11,7 +11,7 @@ import {
   ChatBubbleLeftRightIcon,
   PaperAirplaneIcon
 } from '@heroicons/react/24/outline';
-import { patientService, PersonalizedInstructions, QAResponse } from '../services/api';
+import { PersonalizedInstructions, QAResponse } from '../services/api';
 import { format } from 'date-fns';
 
 const DischargeInstructions: React.FC = () => {

@@ -22,14 +22,13 @@ interface PatientFormData {
   };
   medical_history: { condition: string }[];
 }
-
 const CreatePatient: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   
   // State for dynamic fields
-  const [allergies, setAllergies] = useState<Allergy[]>([{ allergen: '', reaction: '', severity: 'moderate' }]);
-  const [medications, setMedications] = useState<Medication[]>([{ name: '', dosage: '', frequency: '', route: '' }]);
+  const [allergies] = useState<string[]>([]);
+  const [medications] = useState<any[]>([]);
 
   const { register, handleSubmit, control, formState: { errors } } = useForm<PatientFormData>({
     defaultValues: {
