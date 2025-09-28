@@ -1,8 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://web-production-f3389.up.railway.app/api/v1'
-  : process.env.REACT_APP_API_URL || '/api/v1';
+const API_BASE_URL = '/api/v1';
 
 // Create axios instance
 const api = axios.create({
@@ -10,6 +8,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000, // 10 second timeout
 });
 
 // Types
